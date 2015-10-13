@@ -133,6 +133,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.github.tlrx</groupId>
+            <artifactId>elasticsearch-test</artifactId>
+            <version>1.2.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.scopt</groupId>
             <artifactId>scopt_${scala.compat.version}</artifactId>
             <version>${scopt.version}</version>

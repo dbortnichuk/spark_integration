@@ -6,7 +6,7 @@ package ua.softserve.spark
 package object integration {
 
   val MsgUsage = "spark-submit --class \"ua.softserve.spark.integration.ItgDriver\" *.jar"
-  val MsgBrokers = "\"brokers\" is a required property, specify it as comma separated list to point out brokers, Kafka stream to be created on, example: broker1_host:port,broker2_host:port"
+  val MsgBrokers = "\"brokers\" is a required property, specify it as comma separated list to point out brokers Kafka stream to be created on, example: broker1_host:port,broker2_host:port"
   val MsgTopics = "\"topics\" is a required property, specify it as comma separated list to point out topics to consume from, example: topic1,topic2"
   val MsgIndex = "\"index\" is a required property, specify it to point out Elasticsearch index, example: someindex"
   val MsgType = "\"type\" is a required property, specify it to point out Elasticsearch type, example: sometype"
