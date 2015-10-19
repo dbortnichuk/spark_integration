@@ -34,6 +34,10 @@ Application can be configured from command line providing parameters
 ```
 --topics topic1,topic2
 ```
+* --host - is a optional property, specify it to point out Elasticsearch host, default: localhost:9200, example:
+```
+--host localhost:9200
+```
 * **--index** - is a required property, specify it to point out Elasticsearch index, example:
 ```
 --index someindex
@@ -71,3 +75,11 @@ Check Elasticsearch relevant index, example using REST client:
 http://localhost:9200/someindex/sometype/_search?q=state:NY
 ```
 Comprehensive result should be available on this point.
+
+### Known Issues
+There is a slight possibility **consumeAndPutJsonDataSuccessfully** test will fail due to **org.elasticsearch.indices.IndexMissingException**. This usually happens if embedded Spark engine wasn't able to consume data from Kafka to ES index till the moment ES client will start querying mentioned index.
+This is simply handled by introducing a delay. For the moment there is not any sync mechanism to handle this situation graciously as all the actor components are embedded and inherently communicating asynchronously. Run the test:
+
+``` 
+mvn test
+```

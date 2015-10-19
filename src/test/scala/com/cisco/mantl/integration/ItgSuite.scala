@@ -18,18 +18,15 @@ class ItgSuite extends FunSuite with BeforeAndAfterAll {
   kafkaUnitServer.startup
 
   val sparkConf = new SparkConf().setAppName("testContext").setMaster("local[4]")
-  val ssc = new StreamingContext(sparkConf, Seconds(1))
+  val ssc = new StreamingContext(sparkConf, Seconds(1)) //run stream every 1 second
 
   val esHost = "localhost"
   val esPort = "9200"
   val esIndex = "someindex"
   val esType = "sometype"
-
   val initialJson = """{"field111" : "value111" }"""
-  //val initialJson = """{"name": "Silvesters's Italian restaurant", "description": "Great food, great atmosphere!", "address": { "street": "46 W 46th street", "city": "San Hose", "state": "CA", "zip": "10036" }, "location": [40.75, -73.97], "tags": ["italian", "spagetti", "pasta"], "rating": "3.5" }"""
 
   val esSetup = new EsSetup();
-  //esSetup.execute(deleteAll(), createIndex("places").withMapping("restaurant", initialJson))
 
   test("consumeAndPutJsonDataSuccessfully") {
 
@@ -39,18 +36,13 @@ class ItgSuite extends FunSuite with BeforeAndAfterAll {
 
     kafkaUnitServer.sendMessages(keyedMessage)
 
-    //    val messages: util.List[String] = kafkaUnitServer.readMessages(testTopic, 1)
-    //    messages.foreach(println)
-    //    assert(util.Arrays.asList(initialJson) == messages)
-
     ssc.putJson(ssc.consume(kafkaUnitServer.getBrokerString, testTopic), esHost, esPort, esIndex, esType)
 
-    //clean Elasticsearch indexes before starting Spark job
-    esSetup.execute(deleteAll())
+    esSetup.execute(deleteAll()) //clean Elasticsearch indexes before starting Spark job
 
     ssc.start()
     //ssc.awaitTermination()
-    Thread.sleep(10000)
+    Thread.sleep(10000) //wait 10 seconds before starting querying index
 
     val esClient = esSetup.client()
     val response = esClient.prepareSearch(esIndex)
@@ -61,7 +53,6 @@ class ItgSuite extends FunSuite with BeforeAndAfterAll {
 
     assert(response.getHits().totalHits() == 1);
     println("INDEX EXISTS: " + esSetup.exists("someindex"))
-    //    println("RECORDS: " + esSetup.countAll())
 
     ssc.stop(true, true)
 

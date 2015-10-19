@@ -2,6 +2,7 @@ package com.cisco.mantl
 
 /**
  * Created by dbort on 13.10.2015.
+ * Utility object to hold constants.
  */
 package object integration {
 

@@ -10,14 +10,14 @@ import org.elasticsearch.spark.rdd.EsSpark
 
 /**
  * Created by dbort on 09.10.2015.
+ * Spark Streaming integration application.
+ * Integrates Kafka broker and Elasticsearch by listening to Kafka topic, consuming messages and transferring them into ES index.
  */
 object ItgDriver {
 
   def main(args: Array[String]) {
 
     //turn on debug - $ export SPARK_JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
-
-    //Thread.sleep(5 * 1000)
 
     val parser = new scopt.OptionParser[Config](MsgUsage) {
       head("Spark Integration", "1.0")
@@ -67,6 +67,10 @@ object ItgDriver {
     }
   }
 
+  /**
+   * Provides additional methods via implicit conversion for StreamingContext in order to commence consuming broker messages and transferring them into ES index.
+   * @param origin
+   */
   implicit class IntegrationUtils(val origin: StreamingContext) {
 
     def consume(brokers: String, topics: String): InputDStream[(String, String)] = {
@@ -83,6 +87,17 @@ object ItgDriver {
     }
   }
 
+  /**
+   * Holder class for local CLI configuration.
+   * @param brokers
+   * @param topics
+   * @param esHost
+   * @param esIndex
+   * @param esType
+   * @param master
+   * @param name
+   * @param batchInterval
+   */
   case class Config(brokers: String = "",
                     topics: String = "",
                     esHost: String = "localhost:9200",

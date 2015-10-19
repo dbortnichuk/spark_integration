@@ -2,14 +2,14 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>ua.softserve.spark</groupId>
+    <groupId>com.cisco.mantl</groupId>
     <artifactId>spark_integration</artifactId>
     <packaging>jar</packaging>
     <description>spark_integration</description>
     <version>1.0</version>
     <name>spark_integration</name>
     <organization>
-        <name>ua.softserve.spark</name>
+        <name>com.cisco.mantl</name>
     </organization>
     <developers>
         <developer>
@@ -25,7 +25,9 @@
         <scala.compat.version>2.10</scala.compat.version>
         <spark.version>1.5.0</spark.version>
         <spark.kafka.version>1.3.0</spark.kafka.version>
+        <spark.kafka.test.version>0.2</spark.kafka.test.version>
         <elasticsearch.version>2.1.1</elasticsearch.version>
+        <elasticsearch.test.version>1.2.1</elasticsearch.test.version>
         <hadoop.version>2.7.1</hadoop.version>
         <scopt.version>3.3.0</scopt.version>
     </properties>
@@ -86,11 +88,6 @@
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.scala-lang</groupId>-->
-        <!--<artifactId>scala-compiler</artifactId>-->
-        <!--<version>2.10.5</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.compat.version}</artifactId>
@@ -145,28 +142,15 @@
         <dependency>
             <groupId>com.github.tlrx</groupId>
             <artifactId>elasticsearch-test</artifactId>
-            <version>1.2.1</version>
+            <version>${elasticsearch.test.version}</version>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.apache.kafka</groupId>-->
-        <!--<artifactId>kafka_2.9.2</artifactId>-->
-        <!--<version>0.8.2.2</version>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>org.apache.curator</groupId>-->
-        <!--<artifactId>curator-test</artifactId>-->
-        <!--<version>2.2.0-incubating</version>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>info.batey.kafka</groupId>
             <artifactId>kafka-unit</artifactId>
-            <version>0.2</version>
+            <version>${spark.kafka.test.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
     <repositories>
         <repository>
