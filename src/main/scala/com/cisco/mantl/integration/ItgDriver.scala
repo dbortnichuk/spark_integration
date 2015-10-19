@@ -1,12 +1,10 @@
-package ua.softserve.spark.integration
+package com.cisco.mantl.integration
 
-import kafka.serializer.StringDecoder
-
+import _root_.kafka.serializer.{StringDecoder, StringEncoder}
+import org.apache.spark.SparkConf
 import org.apache.spark.streaming._
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka._
-import org.apache.spark.{SparkContext, SparkConf}
-import org.elasticsearch.spark._
 import org.elasticsearch.spark.rdd.EsSpark
 
 
@@ -24,22 +22,26 @@ object ItgDriver {
     val parser = new scopt.OptionParser[Config](MsgUsage) {
       head("Spark Integration", "1.0")
       opt[String]('b', "brokers") required() valueName ("<brokers>") action { (x, c) =>
-        c.copy(brokers = x)
+        c.copy(brokers = x.trim)
       } text (MsgBrokers)
       opt[String]('t', "topics") required() valueName ("<topics>") action { (x, c) =>
-        c.copy(topics = x)
+        c.copy(topics = x.trim)
       } text (MsgTopics)
+      opt[String]('h', "host") valueName ("<esHost>") action { (x, c) =>
+        c.copy(esHost = x.trim)
+      } validate { x => if (x.split(":").size > 1) success else failure("Value of --host must conform to format <hostname>:<port>")
+      } text (MsgHost)
       opt[String]('i', "index") required() valueName ("<esIndex>") action { (x, c) =>
-        c.copy(esIndex = x)
+        c.copy(esIndex = x.trim)
       } text (MsgIndex)
       opt[String]('s', "type") required() valueName ("<esType>") action { (x, c) =>
-        c.copy(esType = x)
+        c.copy(esType = x.trim)
       } text (MsgType)
       opt[String]('m', "master") valueName ("<masterURI>") action { (x, c) =>
-        c.copy(master = x)
+        c.copy(master = x.trim)
       } text (MsgMaster)
       opt[String]('n', "name") valueName ("<appName>") action { (x, c) =>
-        c.copy(name = x)
+        c.copy(name = x.trim)
       } text (MsgName)
       opt[Long]('c', "batchint") valueName ("<batchInterval>") action { (x, c) =>
         c.copy(batchInterval = x)
@@ -56,9 +58,9 @@ object ItgDriver {
         if(!config.master.isEmpty)sparkConf.setMaster(config.master)
 
         val ssc = new StreamingContext(sparkConf, Seconds(config.batchInterval))
-        ssc.putJson(ssc.consume(config.brokers, config.topics), config.esIndex, config.esType)
+        val esHostInfo = config.esHost.split(":")
+        ssc.putJson(ssc.consume(config.brokers, config.topics), esHostInfo(0), esHostInfo(1), config.esIndex, config.esType)
 
-        // Start the computation
         ssc.start()
         ssc.awaitTermination()
       case None => println("ERROR: bad argument set provided")
@@ -69,19 +71,21 @@ object ItgDriver {
 
     def consume(brokers: String, topics: String): InputDStream[(String, String)] = {
       val topicsSet = topics.split(",").toSet
-      val kafkaParams = Map[String, String]("metadata.broker.list" -> brokers)
+      val kafkaParams = Map[String, String]("metadata.broker.list" -> brokers, "serializer.class" -> classOf[StringEncoder].getName, "auto.offset.reset" -> "smallest")
       KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](origin, kafkaParams, topicsSet)
     }
 
-    def putJson(messages: InputDStream[(String, String)], esIndex: String, esType: String): Unit = {
+    def putJson(messages: InputDStream[(String, String)], esHost: String, esPort: String, esIndex: String, esType: String): Unit = {
       val lines = messages.map(_._2)
       lines.print()
-      lines.foreachRDD(rdd => EsSpark.saveJsonToEs(rdd, esIndex + "/" + esType))
+      val esParams = Map[String, String]("es.nodes" -> esHost, "es.port" -> esPort)
+      lines.foreachRDD(rdd => EsSpark.saveJsonToEs(rdd, esIndex + "/" + esType, esParams))
     }
   }
 
   case class Config(brokers: String = "",
                     topics: String = "",
+                    esHost: String = "localhost:9200",
                     esIndex: String = "",
                     esType: String = "",
                     master: String = "",

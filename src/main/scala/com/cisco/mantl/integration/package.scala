@@ -1,4 +1,4 @@
-package ua.softserve.spark
+package com.cisco.mantl
 
 /**
  * Created by dbort on 13.10.2015.
@@ -7,6 +7,7 @@ package object integration {
 
   val MsgUsage = "spark-submit --class \"ua.softserve.spark.integration.ItgDriver\" *.jar"
   val MsgBrokers = "\"brokers\" is a required property, specify it as comma separated list to point out brokers Kafka stream to be created on, example: broker1_host:port,broker2_host:port"
+  val MsgHost = "\"host\" is a optional property, specify it to point out Elasticsearch host, default: localhost:9200"
   val MsgTopics = "\"topics\" is a required property, specify it as comma separated list to point out topics to consume from, example: topic1,topic2"
   val MsgIndex = "\"index\" is a required property, specify it to point out Elasticsearch index, example: someindex"
   val MsgType = "\"type\" is a required property, specify it to point out Elasticsearch type, example: sometype"
